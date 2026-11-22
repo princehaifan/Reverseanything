@@ -8,7 +8,7 @@ export default function Methodology() {
       <div className="prose">
         <h2>What is real</h2>
         <p>
-          <Link to="/live" style={{ textDecoration: 'underline' }}>Live App Store charts</Link> are fetched from Apple's public chart feed, with ratings
+          <Link to="/live" style={{ textDecoration: 'underline' }}>Live App Store charts</Link> (top free, top paid and top grossing) are fetched from Apple's public chart feed, with ratings
           from the public iTunes lookup API. Those are real apps and real, current ranks.
         </p>
         <h2>What is modelled</h2>

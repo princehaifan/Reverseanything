@@ -87,17 +87,24 @@ describe('domains', () => {
 });
 
 describe('live connector', () => {
-  const feed = { feed: { updated: 'Mon, 1 Jan 2026 00:00:00 +0000', results: [
-    { id: '10', name: 'Alpha', artistName: 'A Inc', artworkUrl100: 'https://x/a.png', url: 'https://x/a', genres: [{ name: 'Games' }], releaseDate: '2024-01-01' },
-    { id: '20', name: 'Beta', artistName: 'B Inc', artworkUrl100: 'https://x/b.png', url: 'https://x/b', genres: [] },
+  const entry = (id: string, name: string, extra: object = {}) => ({
+    'im:name': { label: name }, 'im:artist': { label: `${name} Inc` }, id: { label: `https://x/${id}`, attributes: { 'im:id': id } },
+    'im:image': [{ label: 'https://x/53.png' }, { label: 'https://x/100.png' }], 'im:price': { label: 'Get', attributes: { amount: '0' } },
+    ...extra,
+  });
+  const feed = { feed: { updated: { label: '2026-01-01T00:00:00-07:00' }, entry: [
+    entry('10', 'Alpha', { category: { attributes: { label: 'Games' } }, 'im:releaseDate': { label: '2024-01-01T00:00:00-07:00' } }),
+    entry('20', 'Beta', { 'im:price': { label: '$2.99', attributes: { amount: '2.99' } } }),
   ] } };
-  const lookup = { results: [{ trackId: 10, averageUserRating: 4.5, userRatingCount: 1200, primaryGenreName: 'Puzzle', formattedPrice: 'Free' }] };
+  const lookup = { results: [{ trackId: 10, averageUserRating: 4.5, userRatingCount: 1200, primaryGenreName: 'Puzzle' }] };
 
   it('parses the feed and merges lookup data', () => {
     const { entries, updated } = parseFeed(feed, lookup);
     expect(updated).toContain('2026');
-    expect(entries[0]).toMatchObject({ rank: 1, id: '10', genre: 'Puzzle', rating: 4.5, ratingCount: 1200, price: 'Free' });
-    expect(entries[1]).toMatchObject({ rank: 2, name: 'Beta', genre: null, rating: null });
+    expect(entries[0]).toMatchObject({ rank: 1, id: '10', genre: 'Games', rating: 4.5, ratingCount: 1200, price: 'Free', icon: 'https://x/100.png', releaseDate: '2024-01-01' });
+    expect(entries[1]).toMatchObject({ rank: 2, name: 'Beta', genre: null, rating: null, price: '$2.99' });
+    expect(parseFeed({ feed: { entry: entry('30', 'Solo') } }).entries).toHaveLength(1);
+    expect(parseFeed({}).entries).toEqual([]);
   });
   it('reports unavailable instead of throwing when the network fails', async () => {
     const r = await liveChart('fr', 'top-paid', async () => { throw new Error('blocked'); });

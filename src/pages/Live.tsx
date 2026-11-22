@@ -9,13 +9,16 @@ const COUNTRY_NAMES: Record<string, string> = {
   br: 'Brazil', in: 'India', id: 'Indonesia', mx: 'Mexico', ca: 'Canada', cn: 'China',
 };
 
+const CHART_NAMES: Record<string, string> = { 'top-free': 'Top free', 'top-paid': 'Top paid', 'top-grossing': 'Top grossing' };
+
 const columns: Column<LiveEntry>[] = [
   { key: 'rank', label: '#', className: 'rank', render: (r) => r.rank, csv: (r) => r.rank },
   {
     key: 'app', label: 'App', sort: (r) => r.name.toLowerCase(), csv: (r) => r.name,
     render: (r) => (
       <span className="app-cell">
-        <img src={r.icon} alt="" width={36} height={36} loading="lazy" style={{ borderRadius: 9, flex: 'none', background: 'var(--surface-2)' }} />
+        <img src={r.icon} alt="" width={36} height={36} loading="lazy" style={{ borderRadius: 9, flex: 'none', background: 'var(--surface-2)' }}
+          onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} />
         <span className="meta"><span className="name">{r.name}</span><span className="sub">{r.publisher}</span></span>
       </span>
     ),
@@ -36,15 +39,15 @@ export default function Live() {
   const state = useApi<LiveChart>('/live/charts', { country, chart }, false);
   return (
     <>
-      <PageHead title="Live App Store charts" subtitle="Real, current rankings from Apple's public chart feed. Unlike the rest of Tidemark, nothing on this page is modelled.">
-        <Seg label="Chart" value={chart} onChange={setChart} options={[['top-free', 'Top free'], ['top-paid', 'Top paid']]} />
+      <PageHead title="Live App Store charts" subtitle="Real, current free, paid and grossing rankings from Apple's public chart feed. Unlike the rest of Tidemark, nothing on this page is modelled.">
+        <Seg label="Chart" value={chart} onChange={setChart} options={[['top-free', 'Top free'], ['top-paid', 'Top paid'], ['top-grossing', 'Top grossing']]} />
         <Select label="Storefront" value={country} onChange={setCountry}
           options={(meta?.live.countries ?? ['us']).map((c) => [c, COUNTRY_NAMES[c] ?? c.toUpperCase()] as const)} />
         <button className="btn" onClick={state.reload} disabled={state.loading}>Refresh</button>
       </PageHead>
       <Async state={state}>
         {(d) => d.available ? (
-          <Card flush title={`${chart === 'top-free' ? 'Top free' : 'Top paid'} apps, ${COUNTRY_NAMES[d.country] ?? d.country}`}
+          <Card flush title={`${CHART_NAMES[d.chart] ?? d.chart} apps, ${COUNTRY_NAMES[d.country] ?? d.country}`}
             subtitle={d.fetchedAt ? `Fetched ${new Date(d.fetchedAt).toLocaleString()}. Cached for up to 30 minutes.` : undefined}
             tools={<ExportButton name={`app-store-${d.chart}-${d.country}`} {...tableCsv(columns, d.entries)} />}>
             <DataTable columns={columns} rows={d.entries} rowKey={(r) => r.id} />
@@ -52,7 +55,7 @@ export default function Live() {
         ) : (
           <div className="notice" role="status">
             <strong>Live charts are unavailable right now.</strong> {d.reason} The server needs outbound HTTPS access to{' '}
-            <code>rss.marketingtools.apple.com</code> and <code>itunes.apple.com</code>. Everything else in Tidemark keeps working without it.
+            <code>itunes.apple.com</code>. Everything else in Tidemark keeps working without it.
           </div>
         )}
       </Async>

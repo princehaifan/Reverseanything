@@ -14,7 +14,7 @@ A market intelligence platform for the digital economy: one workspace covering *
 | **Audience** | Age and gender vs benchmarks, interest affinities, cross-app usage, usage by hour, retention curve and weekly cohorts |
 | **Gaming** | Genre market size, revenue per download and ARPDAU, retention benchmarks, monetization model by genre, live-operations feed |
 | **Tools** | Compare up to four apps (shareable link), watchlist with alerts, global search, CSV export on every table and chart, table view for every chart, light and dark themes |
-| **Live App Store charts** | Real, current top free and top paid rankings from Apple's public feed |
+| **Live App Store charts** | Real, current top free, top paid and top grossing rankings from Apple's public feed |
 
 ## Important: about the data
 
@@ -47,7 +47,7 @@ npm run build
 npm start
 ```
 
-Then open http://localhost:8787. Set `PORT` to change the port. The live charts page needs outbound HTTPS to `rss.marketingtools.apple.com` and `itunes.apple.com`; without it that page shows a notice and the rest keeps working.
+Then open http://localhost:8787. Set `PORT` to change the port. The live charts page needs outbound HTTPS to `itunes.apple.com`; without it that page shows a notice and the rest keeps working. Behind an HTTP proxy, `npm start` already sets `NODE_USE_ENV_PROXY=1` so Node (22.21 or newer) honours `HTTPS_PROXY`.
 
 ```bash
 npm test
