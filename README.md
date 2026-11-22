@@ -16,6 +16,8 @@ A market intelligence platform for the digital economy: one workspace covering *
 | **Tools** | Compare up to four apps (shareable link), watchlist with alerts, global search, CSV export on every table and chart, table view for every chart, light and dark themes |
 | **Live App Store charts** | Real, current top free, top paid and top grossing rankings from Apple's public feed |
 
+**Live demo:** https://tidemark-intelligence.netlify.app
+
 ## Important: about the data
 
 Commercial products in this space estimate their numbers from proprietary consumer panels, publisher data partnerships and ad-network crawls. None of that exists in public APIs, so:
@@ -52,6 +54,10 @@ Then open http://localhost:8787. Set `PORT` to change the port. The live charts 
 ```bash
 npm test
 ```
+
+### Deploying
+
+The repo deploys to Netlify as-is: `netlify.toml` builds the UI into `dist` and runs the Express API as a single function (`netlify/functions/api.mts`), with `/api/*` rewritten to it. Any Node host works too: run `npm run build` then `npm start`.
 
 ## How it is built
 
